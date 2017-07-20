@@ -26,6 +26,7 @@ import {
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
+	getSelectedBlock,
 } from '../../selectors';
 import { insertBlock, multiSelect } from '../../actions';
 
@@ -38,6 +39,7 @@ class VisualEditorBlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
+		this.onExtendMultiSelection = this.onExtendMultiSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
@@ -182,6 +184,16 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'touchend', this.onSelectionEnd );
 	}
 
+	onExtendMultiSelection( uid ) {
+		const { selectedBlock, selectionStart, onMultiSelect } = this.props;
+
+		if ( selectedBlock ) {
+			onMultiSelect( selectedBlock.uid, uid );
+		} else if ( selectionStart ) {
+			onMultiSelect( selectionStart, uid );
+		}
+	}
+
 	onPlaceholderKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			this.appendDefaultBlock();
@@ -203,6 +215,7 @@ class VisualEditorBlockList extends Component {
 			blocks,
 			showInsertionPoint,
 			insertionPoint,
+			selectionStart,
 			multiSelectedBlockUids,
 		} = this.props;
 
@@ -232,7 +245,9 @@ class VisualEditorBlockList extends Component {
 							key={ uid }
 							uid={ uid }
 							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+							selectionStart={ selectionStart }
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
+							onExtendMultiSelection={ () => this.onExtendMultiSelection( uid ) }
 							multiSelectedBlockUids={ multiSelectedBlockUids }
 						/>
 					);
@@ -279,6 +294,7 @@ export default connect(
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onInsertBlock( block ) {

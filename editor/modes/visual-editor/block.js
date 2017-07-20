@@ -233,8 +233,17 @@ class VisualEditorBlock extends Component {
 			return;
 		}
 
-		this.props.onSelectionStart();
-		this.props.onSelect();
+		if ( event.shiftKey ) {
+			if ( this.props.uid === this.props.selectionStart ) {
+				this.props.onSelect();
+			} else if ( ! this.props.isSelected ) {
+				this.props.onExtendMultiSelection();
+				event.preventDefault();
+			}
+		} else {
+			this.props.onSelectionStart();
+			this.props.onSelect();
+		}
 	}
 
 	onKeyDown( event ) {

@@ -524,6 +524,63 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+const locations = [
+	'advanced',
+	'normal',
+	'side',
+];
+
+const defaultMetaBoxState = locations.reduce( ( result, key ) => {
+	result[ key ] = {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	};
+
+	return result;
+}, {} );
+
+export function metaBoxes( state = defaultMetaBoxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_META_BOX_STATE':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isActive: action.metaBoxes[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		case 'HANDLE_META_BOX_RELOAD':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
+		case 'REQUEST_META_BOX_UPDATES':
+			return action.locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isUpdating: true,
+					isDirty: false,
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_STATE_CHANGED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isDirty: action.hasChanged,
+				},
+			};
+		default:
+			return state;
+	}
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -535,4 +592,5 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
+	metaBoxes,
 } ) );

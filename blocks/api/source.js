@@ -1,13 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { createElement } from '@wordpress/element';
-
-/**
  * External dependencies
  */
 import { nodeListToReact, nodeToReact } from 'dom-react';
-import { flow } from 'lodash';
+import { flow, omit } from 'lodash';
 import {
 	attr as originalAttr,
 	prop as originalProp,
@@ -30,6 +25,14 @@ function withKnownSourceFlag( fn ) {
 	} );
 }
 
+function toArray( ...args ) {
+	return [ toElement( ...args ) ];
+}
+
+function toElement( type, props, ...children ) {
+	return [ type, omit( props, 'key' ), ...children ];
+}
+
 export const attr = withKnownSourceFlag( originalAttr );
 export const prop = withKnownSourceFlag( originalProp );
 export const html = withKnownSourceFlag( originalHtml );
@@ -44,7 +47,7 @@ export const children = withKnownSourceFlag( ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], createElement );
+			return nodeListToReact( match.childNodes || [], toArray );
 		}
 
 		return [];
@@ -58,6 +61,6 @@ export const node = withKnownSourceFlag( ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, createElement );
+		return nodeToReact( match, toElement );
 	};
 } );

@@ -12,6 +12,7 @@ import { registerBlockType, source } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import Editable from '../../editable';
 
 const { children } = source;
 
@@ -81,7 +82,7 @@ registerBlockType( 'core/table', {
 		const { content, align } = attributes;
 		return (
 			<table className={ align ? `align${ align }` : null }>
-				{ content }
+				<Editable.Value value={ content } />
 			</table>
 		);
 	},

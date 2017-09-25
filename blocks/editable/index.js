@@ -22,7 +22,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, createBlobURL } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -87,6 +87,7 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 
 		this.state = {
 			formats: {},
@@ -119,6 +120,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
+		editor.on( 'paste', this.onPaste, true );
 
 		patterns.apply( this, [ editor ] );
 
@@ -194,6 +196,29 @@ export default class Editable extends Component {
 			// from running, but we assume TinyMCE won't do anything on an
 			// empty undo stack anyways.
 		}
+	}
+
+	onPaste( event ) {
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const items = Array.from( dataTransfer[ dataTransfer.items.length ? 'items' : 'files' ] );
+
+		items.forEach( ( item ) => {
+			if ( ! /^image\/(?:jpe?g|png|gif)$/.test( item.type ) ) {
+				return;
+			}
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			if ( ! blob ) {
+				return;
+			}
+
+			this.editor.fire( 'BeforePastePreProcess', {
+				content: `<img src="${ createBlobURL( blob ) }">`,
+			} );
+
+			event.preventDefault();
+		} );
 	}
 
 	onBeforePastePreProcess( event ) {

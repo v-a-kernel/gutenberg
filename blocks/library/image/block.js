@@ -10,7 +10,7 @@ import { startCase, findKey } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -42,8 +42,29 @@ class ImageBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.attributes.id ) {
-			this.fetchMedia( this.props.attributes.id );
+		const { attributes, setAttributes } = this.props;
+		const { id, url } = attributes;
+
+		if ( id ) {
+			this.fetchMedia( id );
+		}
+
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			createMediaFromFile( getBlobByURL( url ) ).then( ( media ) => {
+				setAttributes( {
+					id: media.id,
+					url: media.source_url,
+				} );
+			} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { id: prevID, url: prevUrl } = prevProps.attributes;
+		const { id, url } = this.props.attributes;
+
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
 		}
 	}
 

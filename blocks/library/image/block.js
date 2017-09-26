@@ -43,7 +43,7 @@ class ImageBlock extends Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-		const { id, url } = attributes;
+		const { id, url = '' } = attributes;
 
 		if ( id ) {
 			this.fetchMedia( id );
@@ -62,8 +62,8 @@ class ImageBlock extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { id: prevID, url: prevUrl } = prevProps.attributes;
-		const { id, url } = this.props.attributes;
+		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id, url = '' } = this.props.attributes;
 
 		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
 			revokeBlobURL( url );

@@ -199,26 +199,21 @@ export default class Editable extends Component {
 	}
 
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
-		const items = Array.from( dataTransfer[ dataTransfer.items && dataTransfer.items.length ? 'items' : 'files' ] || [] );
+		const { items = [], files = [] } = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 
-		items.forEach( ( item ) => {
-			if ( ! /^image\/(?:jpe?g|png|gif)$/.test( item.type ) ) {
-				return;
-			}
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
 
 			const blob = item.getAsFile ? item.getAsFile() : item;
-
-			if ( ! blob ) {
-				return;
-			}
 
 			this.editor.fire( 'BeforePastePreProcess', {
 				content: `<img src="${ createBlobURL( blob ) }">`,
 			} );
 
 			event.preventDefault();
-		} );
+		}
 	}
 
 	onBeforePastePreProcess( event ) {

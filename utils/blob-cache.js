@@ -1,3 +1,7 @@
+/**
+ * Browser dependencies
+ */
+const { fetch } = window;
 const { createObjectURL, revokeObjectURL } = window.URL;
 
 const cache = {};
@@ -11,10 +15,17 @@ export function createBlobURL( blob ) {
 }
 
 export function getBlobByURL( url ) {
-	return cache[ url ];
+	if ( cache[ url ] ) {
+		return Promise.resolve( cache[ url ] );
+	}
+
+	return fetch( url ).then( ( response ) => response.blob() );
 }
 
 export function revokeBlobURL( url ) {
-	revokeObjectURL( url );
+	if ( cache[ url ] ) {
+		revokeObjectURL( url );
+	}
+
 	delete cache[ url ];
 }

@@ -50,7 +50,9 @@ class ImageBlock extends Component {
 		}
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
-			createMediaFromFile( getBlobByURL( url ) ).then( ( media ) => {
+			getBlobByURL( url )
+			.then( createMediaFromFile )
+			.then( ( media ) => {
 				setAttributes( {
 					id: media.id,
 					url: media.source_url,

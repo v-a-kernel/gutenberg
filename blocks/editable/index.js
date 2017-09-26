@@ -200,7 +200,7 @@ export default class Editable extends Component {
 
 	onPaste( event ) {
 		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
-		const items = Array.from( dataTransfer[ dataTransfer.items.length ? 'items' : 'files' ] );
+		const items = Array.from( dataTransfer[ dataTransfer.items && dataTransfer.items.length ? 'items' : 'files' ] || [] );
 
 		items.forEach( ( item ) => {
 			if ( ! /^image\/(?:jpe?g|png|gif)$/.test( item.type ) ) {

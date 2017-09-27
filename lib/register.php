@@ -273,7 +273,12 @@ function gutenberg_can_edit_post( $post_id ) {
 }
 
 /**
- * Determine whether a post has blocks.
+ * Determine whether a post has blocks. This test optimizes for performance
+ * rather than strict accuracy, detecting the pattern of a block but not
+ * validating its structure. For strict accuracy, you should use the block
+ * parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
  *
@@ -282,7 +287,24 @@ function gutenberg_can_edit_post( $post_id ) {
  */
 function gutenberg_post_has_blocks( $post_id ) {
 	$post = get_post( $post_id );
-	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
+	return $post && gutenberg_content_has_blocks( $post->post_content );
+}
+
+/**
+ * Determine whether a content string contains blocks. This test optimizes for
+ * performance rather than strict accuracy, detecting the pattern of a block
+ * but not validating its structure. For strict accuracy, you should use the
+ * block parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
+ *
+ * @since 1.2.0
+ *
+ * @param string $content Content to test.
+ * @return bool Whether the content contains blocks.
+ */
+function gutenberg_content_has_blocks( $content ) {
+	return false !== strpos( $content, '<!-- wp:' );
 }
 
 /**

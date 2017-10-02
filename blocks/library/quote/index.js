@@ -13,14 +13,12 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children, node: element, query } = source;
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
@@ -30,12 +28,21 @@ registerBlockType( 'core/quote', {
 	attributes: {
 		value: {
 			type: 'array',
-			source: query( 'blockquote > p', element() ),
+			source: {
+				type: 'query',
+				selector: 'blockquote > p',
+				source: {
+					type: 'node',
+				},
+			},
 			default: [],
 		},
 		citation: {
 			type: 'array',
-			source: children( 'footer' ),
+			source: {
+				type: 'children',
+				selector: 'footer',
+			},
 		},
 		align: {
 			type: 'string',

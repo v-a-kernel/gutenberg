@@ -13,14 +13,12 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { attr } = source;
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
@@ -32,7 +30,11 @@ registerBlockType( 'core/audio', {
 	attributes: {
 		src: {
 			type: 'string',
-			source: attr( 'audio', 'src' ),
+			source: {
+				type: 'atttribute',
+				selector: 'audio',
+				attribute: 'src',
+			},
 		},
 		align: {
 			type: 'string',

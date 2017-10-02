@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import { get, isFunction, some, keys } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -104,10 +104,21 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+
+	const attributes = settings.attributes
+		? settings.attributes
+		: get( window._wpBlocksAttributes, name, );
+
 	const block = blocks[ name ] = {
-		name,
-		attributes: get( window._wpBlocksAttributes, name ),
 		...settings,
+		name,
+		attributes: keys( attributes ).reduce( ( memo, attributeKey ) => {
+			memo[ attributeKey ] = {
+				source: { type: 'comment' },
+				...attributes[ attributeKey ],
+			};
+			return memo;
+		}, {} ),
 	};
 
 	return block;

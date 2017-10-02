@@ -17,12 +17,10 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-
-const { children } = source;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -43,7 +41,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			},
 			caption: {
 				type: 'array',
-				source: children( 'figcaption' ),
+				source: {
+					type: 'children',
+					selector: 'figcaption',
+				},
 				default: [],
 			},
 			align: {

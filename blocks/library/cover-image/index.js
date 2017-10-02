@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -18,8 +18,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -33,7 +31,10 @@ registerBlockType( 'core/cover-image', {
 	attributes: {
 		title: {
 			type: 'array',
-			source: children( 'h2' ),
+			source: {
+				type: 'children',
+				selector: 'h2',
+			},
 		},
 		url: {
 			type: 'string',

@@ -9,10 +9,8 @@ import { createMediaFromFile } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import ImageBlock from './block';
-
-const { attr, children } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -26,19 +24,34 @@ registerBlockType( 'core/image', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: attr( 'img', 'src' ),
+			source: {
+				type: 'attribute',
+				selector: 'img',
+				attribute: 'src',
+			},
 		},
 		alt: {
 			type: 'string',
-			source: attr( 'img', 'alt' ),
+			source: {
+				type: 'attribute',
+				selector: 'img',
+				attribute: 'alt',
+			},
 		},
 		caption: {
 			type: 'array',
-			source: children( 'figcaption' ),
+			source: {
+				type: 'children',
+				selector: 'figcaption',
+			},
 		},
 		href: {
 			type: 'string',
-			source: attr( 'a', 'href' ),
+			source: {
+				type: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
 		},
 		id: {
 			type: 'number',

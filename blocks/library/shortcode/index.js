@@ -8,11 +8,9 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { text } = source;
 
 registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),
@@ -24,7 +22,9 @@ registerBlockType( 'core/shortcode', {
 	attributes: {
 		text: {
 			type: 'string',
-			source: text(),
+			source: {
+				type: 'text',
+			},
 		},
 	},
 

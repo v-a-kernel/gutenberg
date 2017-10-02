@@ -9,7 +9,7 @@ import { IconButton } from '@wordpress/components';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
@@ -17,8 +17,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { attr, children } = source;
 
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
@@ -30,15 +28,26 @@ registerBlockType( 'core/button', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: attr( 'a', 'href' ),
+			source: {
+				type: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
 		},
 		title: {
 			type: 'string',
-			source: attr( 'a', 'title' ),
+			source: {
+				type: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
 		},
 		text: {
 			type: 'array',
-			source: children( 'a' ),
+			source: {
+				type: 'children',
+				selector: 'a',
+			},
 		},
 		align: {
 			type: 'string',

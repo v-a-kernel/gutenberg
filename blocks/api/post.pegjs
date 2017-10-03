@@ -5,6 +5,13 @@
 // are the same as `json_decode`
 ?> **/
 
+function freeform( s ) {
+  return s.length && {
+    blockName: 'core/freeform',
+    innerHtml: s
+  };
+}
+
 function maybeJSON( s ) {
 	try {
 		return JSON.parse( s );
@@ -15,19 +22,35 @@ function maybeJSON( s ) {
 
 }
 
-Document
-  = WP_Block_List
+Block_List
+  = pre:$(!Token .)*
+    ts:(t:Token html:$((!Token .)*) { /** <?php return $t; ?> **/ return [ t, html ] })*
+    post:$(.*)
+  { /** <?php
+    $blocks = [];
+    if ( ! empty( $pre ) ) { $blocks[] = $pre; }
+    foreach ( $ts as $pair ) {
+      $blocks[] = $pair[ 0 ];
+      if ( ! empty( $pair[ 1 ] ) ) { $blocks[] = $pair[ 1 ] };
+    }
+    if ( ! empty( $post ) ) { $blocks[] = $post; }
 
-WP_Block_List
-  = WP_Block*
+    return $blocks;
+    ?> **/
 
-WP_Block
-  = WP_Tag_More
-  / WP_Block_Void
-  / WP_Block_Balanced
-  / WP_Block_Html
+    return [
+      freeform( pre ),
+      ...ts.reduce( ( out, [ t, h ] ) => [ ...out, t, freeform( h ) ], [] ),
+      freeform( post ),
+    ].filter( a => a )
+  }
 
-WP_Tag_More
+Token
+  = Tag_More
+  / Block_Void
+  / Block_Balanced
+
+Tag_More
   = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
   { /** <?php
     $attrs = array( 'noTeaser' => (bool) $noTeaser );
@@ -37,7 +60,7 @@ WP_Tag_More
     return array(
        'blockName' => 'core/more',
        'attrs' => $attrs,
-       'rawContent' => ''
+       'innerHtml' => ''
     );
     ?> **/
     return {
@@ -46,12 +69,12 @@ WP_Tag_More
         customText: customText || undefined,
         noTeaser: !! noTeaser
       },
-      rawContent: ''
+      innerHtml: ''
     }
   }
 
-WP_Block_Void
-  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+Block_Void
+  = "<!--" WS+ "wp:" blockName:Block_Name WS+ attrs:(a:Block_Attributes WS+ {
     /** <?php return $a; ?> **/
     return a;
   })? "/-->"
@@ -60,62 +83,52 @@ WP_Block_Void
     return array(
       'blockName'  => $blockName,
       'attrs'      => $attrs,
-      'rawContent' => '',
+      'innerBlocks' => array(),
+      'innerHtml' => '',
     );
     ?> **/
 
     return {
       blockName: blockName,
       attrs: attrs,
-      rawContent: ''
+      innerBlocks: [],
+      innerHtml: ''
     };
   }
 
-WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any {
-    /** <?php return $c; ?> **/
-    return c;
-  })* e:WP_Block_End & {
-    /** <?php return $s['blockName'] === $e['blockName']; ?> **/
-    return s.blockName === e.blockName;
-  }
+Block_Balanced
+  = s:Block_Start children:(Token / $(!Block_End .))+ e:Block_End
   {
     /** <?php
+    $innerBlocks = array_filter( $children, function( $a ) {
+      return ! is_string( $a );
+    } );
+
+    $innerHtml = array_filter( $children, function( $a ) {
+      return is_string( $a );
+    } );
+
     return array(
       'blockName'  => $s['blockName'],
       'attrs'      => $s['attrs'],
-      'rawContent' => implode( '', $ts ),
+      'innerBlocks'  => $innerBlocks,
+      'innerHtml'  => implode( '', $innerHtml ),
     );
     ?> **/
+
+    var innerBlocks = children.filter( a => 'string' !== typeof a );
+    var innerHtml = children.filter( a => 'string' === typeof a ).join('');
 
     return {
       blockName: s.blockName,
       attrs: s.attrs,
-      rawContent: ts.join( '' )
+      innerBlocks: innerBlocks,
+      innerHtml: innerHtml
     };
   }
 
-WP_Block_Html
-  = ts:(!WP_Block_Balanced !WP_Block_Void !WP_Tag_More c:Any {
-    /** <?php return $c; ?> **/
-    return c;
-  })+
-  {
-    /** <?php
-    return array(
-      'attrs'      => array(),
-      'rawContent' => implode( '', $ts ),
-    );
-    ?> **/
-
-    return {
-      attrs: {},
-      rawContent: ts.join( '' )
-    }
-  }
-
-WP_Block_Start
-  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+Block_Start
+  = "<!--" WS+ "wp:" blockName:Block_Name WS+ attrs:(a:Block_Attributes WS+ {
     /** <?php return $a; ?> **/
     return a;
   })? "-->"
@@ -133,8 +146,8 @@ WP_Block_Start
     };
   }
 
-WP_Block_End
-  = "<!--" WS+ "/wp:" blockName:WP_Block_Name WS+ "-->"
+Block_End
+  = "<!--" WS+ "/wp:" blockName:Block_Name WS+ "-->"
   {
     /** <?php
     return array(
@@ -147,10 +160,10 @@ WP_Block_End
     };
   }
 
-WP_Block_Name
+Block_Name
   = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
 
-WP_Block_Attributes
+Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
   {
     /** <?php return json_decode( $attrs, true ); ?> **/

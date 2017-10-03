@@ -5,10 +5,11 @@
             "postsToShow": 5,
             "displayPostDate": false
         },
-        "rawContent": ""
+        "innerBlocks": [],
+        "innerHtml": ""
     },
     {
-        "attrs": {},
-        "rawContent": "\n"
+        "blockName": "core/freeform",
+        "innerHtml": "\n"
     }
 ]

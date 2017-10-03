@@ -5,10 +5,10 @@
             "customText": "Continue Reading",
             "noTeaser": true
         },
-        "rawContent": ""
+        "innerHtml": ""
     },
     {
-        "attrs": {},
-        "rawContent": "\n"
+        "blockName": "core/freeform",
+        "innerHtml": "\n"
     }
 ]

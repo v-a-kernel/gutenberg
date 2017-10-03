@@ -2,10 +2,11 @@
     {
         "blockName": "core/shortcode",
         "attrs": null,
-        "rawContent": "\n[gallery ids=\"238,338\"]\n"
+        "innerBlocks": [],
+        "innerHtml": "\n[gallery ids=\"238,338\"]\n"
     },
     {
-        "attrs": {},
-        "rawContent": "\n"
+        "blockName": "core/freeform",
+        "innerHtml": "\n"
     }
 ]

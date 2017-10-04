@@ -53,6 +53,9 @@ global.wp = global.wp || {};
 global.wp.a11y = {
 	speak: () => {},
 };
+global.wp.shortcode = {
+	next: () => {},
+};
 
 // Setup fake localStorage
 const storage = {};

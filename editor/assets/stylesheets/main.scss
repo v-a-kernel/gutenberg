@@ -54,11 +54,20 @@ body.gutenberg_page_gutenberg-demo {
 }
 
 .gutenberg__editor {
-	position: relative;
-	height: calc( 100vh - #{ $admin-bar-height-big } );
+	position: absolute;
+	top: $admin-bar-height-big;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	min-height: calc( 100vh - #{ $admin-bar-height-big } );
+
+	@include break-small {
+		top: 0;
+		padding-top: $header-height;
+	}
 
 	@include break-medium {
-		height: calc( 100vh - #{ $admin-bar-height } );
+		min-height: calc( 100vh - #{ $admin-bar-height } );
 	}
 
 	img {
@@ -67,10 +76,6 @@ body.gutenberg_page_gutenberg-demo {
 
 	iframe {
 		width: 100%;
-	}
-
-	@include break-small() {
-		padding-top: $header-height;
 	}
 }
 

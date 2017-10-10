@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, noop } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createPortal, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
 /**
@@ -15,6 +15,7 @@ import { focus, keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
+import { Slot, Fill } from '../slot-fill';
 
 const { ESCAPE } = keycodes;
 
@@ -24,6 +25,13 @@ const { ESCAPE } = keycodes;
  * @type {Number}
  */
 const ARROW_OFFSET = 20;
+
+/**
+ * Name of slot in which popover should fill.
+ *
+ * @type {String}
+ */
+const SLOT_NAME = 'Popover';
 
 export class Popover extends Component {
 	constructor() {
@@ -222,7 +230,6 @@ export class Popover extends Component {
 			return null;
 		}
 
-		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -236,7 +243,7 @@ export class Popover extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<span ref={ this.bindNode( 'anchor' ) }>
-				{ createPortal(
+				<Fill name={ SLOT_NAME }>
 					<PopoverDetectOutside onClickOutside={ onClickOutside }>
 						<div
 							ref={ this.bindNode( 'popover' ) }
@@ -252,17 +259,14 @@ export class Popover extends Component {
 								{ children }
 							</div>
 						</div>
-					</PopoverDetectOutside>,
-					popoverTarget
-				) }
+					</PopoverDetectOutside>
+				</Fill>
 			</span>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
-Popover.contextTypes = {
-	popoverTarget: noop,
-};
+Popover.Slot = () => <Slot name={ SLOT_NAME } />;
 
 export default Popover;

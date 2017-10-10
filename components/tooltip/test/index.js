@@ -8,6 +8,8 @@ import { shallow, mount } from 'enzyme';
  */
 import Tooltip from '../';
 
+jest.mock( '../../slot-fill/fill' );
+
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		// Disable reason: The Tooltip component leverages array return values

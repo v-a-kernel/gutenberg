@@ -13,7 +13,7 @@ import 'moment-timezone/moment-timezone-utils';
  */
 import { EditableProvider } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
-import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/components';
+import { APIProvider, DropZoneProvider, SlotFillProvider as WPSlotFillProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -92,6 +92,15 @@ export function createEditorInstance( id, post, settings ) {
 			SlotFillProvider,
 		],
 
+		// Slot / Fill provider:
+		//
+		//  - context.getSlot
+		//  - context.registerSlot
+		//  - context.unregisterSlot
+		[
+			WPSlotFillProvider,
+		],
+
 		// Editable provider:
 		//
 		//  - context.onUndo
@@ -108,14 +117,6 @@ export function createEditorInstance( id, post, settings ) {
 		[
 			EditorSettingsProvider,
 			{ settings },
-		],
-
-		// Popover provider:
-		//
-		//  - context.popoverTarget
-		[
-			PopoverProvider,
-			{ target },
 		],
 
 		// APIProvider

@@ -175,8 +175,14 @@ export function placeCaretAtVerticalEdge( container, reverse, noScroll ) {
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
 	const y = reverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
-	const range = document.caretRangeFromPoint( x, y );
 	const selection = window.getSelection();
+
+	// Temporary high z-index above toolbars.
+	container.style.zIndex = '10000';
+
+	const range = document.caretRangeFromPoint( x, y );
+
+	container.style.zIndex = null;
 
 	if ( ! range ) {
 		if ( ! noScroll ) {

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,12 +13,11 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened } from '../selectors';
-import { selectBlock, removeBlock, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
+import { isEditorSidebarOpened, getBlockMode } from '../selectors';
+import { removeBlock, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
 
-function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, onToggleSidebar, onShowInspector, onToggleMode } ) {
+function BlockSettingsMenuContent( { mode, onDelete, isSidebarOpened, onToggleSidebar, onShowInspector, onToggleMode, onClose } ) {
 	const toggleInspector = () => {
-		onSelect();
 		onShowInspector();
 		if ( ! isSidebarOpened ) {
 			onToggleSidebar();
@@ -28,36 +28,40 @@ function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, onTogg
 		<div className="editor-block-settings-menu__content">
 			<IconButton
 				className="editor-block-settings-menu__control"
-				onClick={ toggleInspector }
+				onClick={ flow( toggleInspector, onClose ) }
 				icon="admin-generic"
-				label={ __( 'Show inspector' ) }
-			/>
+			>
+				{ __( 'Settings' ) }
+			</IconButton>
 			<IconButton
 				className="editor-block-settings-menu__control"
-				onClick={ onDelete }
-				icon="trash"
-				label={ __( 'Delete the block' ) }
-			/>
-			<IconButton
-				className="editor-block-settings-menu__control"
-				onClick={ onToggleMode }
+				onClick={ flow( onToggleMode, onClose ) }
 				icon="html"
-				label={ __( 'Switch between the visual/text mode' ) }
-			/>
+			>
+				{ mode === 'visual'
+					? __( 'Edit as HTML' )
+					: __( 'Edit in the visual mode' )
+				}
+			</IconButton>
+			<IconButton
+				className="editor-block-settings-menu__control"
+				onClick={ flow( onDelete ) }
+				icon="trash"
+			>
+				{ __( 'Delete' ) }
+			</IconButton>
 		</div>
 	);
 }
 
 export default connect(
-	( state ) => ( {
+	( state, ownProps ) => ( {
 		isSidebarOpened: isEditorSidebarOpened( state ),
+		mode: getBlockMode( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onDelete() {
 			dispatch( removeBlock( ownProps.uid ) );
-		},
-		onSelect() {
-			dispatch( selectBlock( ownProps.uid ) );
 		},
 		onShowInspector() {
 			dispatch( setActivePanel( 'block' ) );

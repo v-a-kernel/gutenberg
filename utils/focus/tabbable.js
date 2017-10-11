@@ -4,13 +4,28 @@
 import { find as findFocusable } from './focusable';
 
 /**
+ * Returns the tab index of the specified element. Returns null if a tabindex
+ * is not explicitly assigned as an attribute. Unlike the tabIndex property,
+ * this doesn't assume any defaults which helps avoid browser inconsistencies.
+ *
+ * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1190261
+ *
+ * @param  {Element} element Element from which to retrieve
+ * @return {?Number}         Tab index of element, or null if not assigned
+ */
+function getTabIndex( element ) {
+	const tabIndex = element.getAttribute( 'tabindex' );
+	return tabIndex === null ? null : parseInt( tabIndex, 10 );
+}
+
+/**
  * Returns true if the specified element is tabbable, or false otherwise.
  *
  * @param  {Element} element Element to test
  * @return {Boolean}         Whether element is tabbable
  */
 function isTabbableIndex( element ) {
-	return element.tabIndex !== -1;
+	return getTabIndex( element ) !== -1;
 }
 
 /**
@@ -48,11 +63,21 @@ function mapObjectTabbableToElement( object ) {
  * @return {Number}   Comparator result
  */
 function compareObjectTabbables( a, b ) {
-	if ( a.element.tabIndex === b.element.tabIndex ) {
+	const aTabIndex = getTabIndex( a.element );
+	const bTabIndex = getTabIndex( b.element );
+
+	if ( aTabIndex === bTabIndex ) {
 		return a.index - b.index;
 	}
 
-	return a.element.tabIndex - b.element.tabIndex;
+	// Either of these two values can be null, but in the wonderful world of
+	// JavaScript coercion, null is effectively zero for this operation.
+	//
+	// Examples:
+	//   2 - null    = 2
+	//   null - 2    = -2
+	//   null - null = 0
+	return aTabIndex - bTabIndex;
 }
 
 export function find( context ) {

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Toolbar, DropdownMenu } from '@wordpress/components';
+import { Toolbar, NavigableMenu, Dropdown, Dashicon, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -114,15 +114,39 @@ export default class TableBlock extends Component {
 				<BlockControls key="menu">
 					<Toolbar>
 						<li>
-							<DropdownMenu
-								icon="editor-table"
-								label={ __( 'Edit Table' ) }
-								controls={
-									TABLE_CONTROLS.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( this.state.editor ),
-									} ) ) }
-							/>
+							<Dropdown
+								renderToggle={ ( { onToggle, isOpen } ) => (
+									<IconButton
+										icon="editor-table"
+										onClick={ onToggle }
+										aria-haspopup="true"
+										aria-expanded={ isOpen }
+										label={ __( 'Edit Table' ) }
+									>
+										<Dashicon icon="arrow-down" />
+									</IconButton>
+								) }
+								renderContent={ ( { onClose } ) => (
+									<NavigableMenu>
+										{ TABLE_CONTROLS.map( ( control, index ) => (
+											<IconButton
+												className="blocks-table__menu-item"
+												key={ index }
+												onClick={ ( event ) => {
+													event.stopPropagation();
+													onClose();
+													control.onClick( this.state.editor );
+												} }
+												icon={ control.icon }
+												role="menuitem"
+											>
+												{ control.title }
+											</IconButton>
+										) ) }
+									</NavigableMenu>
+								) }
+							>
+							</Dropdown>
 						</li>
 					</Toolbar>
 				</BlockControls>

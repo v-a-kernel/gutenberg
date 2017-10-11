@@ -32,3 +32,11 @@
 		background-color: $light-gray-500;
 	}
 }
+
+.blocks-table__menu-item {
+	width: 100%;
+
+	.dashicon {
+		margin-right: 5px;
+	}
+}

@@ -10,7 +10,7 @@ import clickOutside from 'react-click-outside';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton } from '@wordpress/components';
+import { Dashicon, IconButton, NavigableMenu } from '@wordpress/components';
 import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
 
 /**
@@ -95,17 +95,19 @@ class BlockSwitcher extends Component {
 						>
 							{ __( 'Transform into:' ) }
 						</span>
-						{ allowedBlocks.map( ( { name, title, icon } ) => (
-							<IconButton
-								key={ name }
-								onClick={ this.switchBlockType( name ) }
-								className="editor-block-switcher__menu-item"
-								icon={ icon }
-								role="menuitem"
-							>
-								{ title }
-							</IconButton>
-						) ) }
+						<NavigableMenu>
+							{ allowedBlocks.map( ( { name, title, icon } ) => (
+								<IconButton
+									key={ name }
+									onClick={ this.switchBlockType( name ) }
+									className="editor-block-switcher__menu-item"
+									icon={ icon }
+									role="menuitem"
+								>
+									{ title }
+								</IconButton>
+							) ) }
+						</NavigableMenu>
 					</div>
 				}
 			</div>
